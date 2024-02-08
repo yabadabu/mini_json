@@ -1,4 +1,4 @@
-# mini_json
+ # mini_json
 
 This is a json parser to read (there is no write support) and feed structs and classes. It's an over reduction of the features provided by the great https://github.com/nlohmann/json just for my needs, maybe fits yours. It compiles faster, has less dependencies and uses less memory. The usage syntax is similar / almost equal.
 
@@ -81,5 +81,5 @@ Or:
 
 # Integration
 
-Just add the files json.cpp and json_file.cpp in your project.
-
+Just add the files json.cpp and json_file.cpp in your project. Check the sample/demo.cpp for more examples.
+ 
