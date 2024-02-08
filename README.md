@@ -5,7 +5,7 @@ This is a json parser to read (there is no write support) and feed structs and c
 # Use case
 
 * You want your project to compile fast. Including json.h only add's the include <type_traits>
-* You do not need to write json
+* You do not need to write json files, you just consume json's.
 * You parse a json from files, extract data and forget about the json itself.
 * You can use C++17
 
