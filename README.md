@@ -27,22 +27,22 @@ Given a struct `Item`
 
     struct Item {
 	    std::string name;
-    	int         count = 1;
+	    int         count = 1;
     };
 
-You can declare the method load
+You can declare the public method `load`
 
     struct Item {
 	    std::string name;
-    	int         count = 1;
-    	void load( json j ) { ... }
+	    int         count = 1;
+	    void load( json j ) { ... }
     };
 
-Or you can declare the global function load
+Or you can declare the global function `load`
 
 	void load( json j, Item& item ) { ... }
 
-Everytime a json is converted to a C++ type, the templates will trigger a call to the Item::load or call the global `::load` function. If not declared by you, the linker will complain about it.
+Everytime a json is converted to a C++ type, the templates will trigger a call to the `T::load` or call the global `::load` function. If not declared by you, the linker will complain about it.
 
 The conversion from json to basic types : `bool/float/int/const char*` is already defined. Your types require the implementation of this method..
 
@@ -50,7 +50,7 @@ Conversion from `json` array to `std::vector<T>` and `std::unordered_map<std::st
 
 # Object properties
 
-	json jobj = j["items"];				 # Return a new json
+	json jobj = j["items"];              # Return a new json
 	int score = j.value( "score", 5 );   # Return the property 'score' as int 5
 
 # Iterating json
@@ -59,16 +59,23 @@ I use the function onEachArr to iterate over the elements of an array.
 
 	onEachArr(jobj, [](json j, size_t idx) {
 		// j contains the nth item in the jobj
-		
+		// ...
 		});
 
 	onEachArr(j["items"], [](const Item& item, size_t idx) {
 		// j has already been converted during the call to the lambda
+                // ...
 		});
 
 And the onEachObj when I want to iterate over the properties key/value of an json object.
 
 	onEachObj( jobj, [](const char* key, json jitem) {
+		// 
+		})
+
+Or:
+
+	onEachObj( jobj, [](const std::string& name, const Item& jitem) {
 		// 
 		})
 
