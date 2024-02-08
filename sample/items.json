@@ -1,0 +1,36 @@
+{
+ "inventory": [
+	{
+	 "name": "Water",
+	 "count": 3
+	},
+	{
+	 "name": "Food",
+	 "count": 5
+	}
+ ],
+ "weapon": {
+	"name": "Axe"
+ },
+ "my_score": {
+	"score": 100
+ },
+ "obj.properties": {
+	"color": "blue",
+	"age": 99,
+	"saved" : true,
+	"country" : "Spain"
+ },
+ "dict": {
+	"north": {
+	 "name": "Sword"
+	},
+	"south": {
+	 "name": "Spear"
+	},
+	"west": {
+	 "name": "Mace"
+	}
+ }
+
+}
