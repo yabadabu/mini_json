@@ -22,4 +22,7 @@
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\mini_json.natvis" />
+  </ItemGroup>
 </Project>

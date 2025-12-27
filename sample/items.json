@@ -13,13 +13,16 @@
 	"name": "Axe"
  },
  "my_score": {
-	"score": 100
+	"score": 100,
+	"absolute" : true
  },
  "obj.properties": {
 	"color": "blue",
 	"age": 99,
 	"saved" : true,
-	"country" : "Spain"
+	"country" : "Spain",
+	"parent" : null,
+	"relative" : false
  },
  "dict": {
 	"north": {

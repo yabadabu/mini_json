@@ -135,6 +135,9 @@
     <ClInclude Include="..\mini_json\json.h" />
     <ClInclude Include="..\mini_json\json_file.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\mini_json.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

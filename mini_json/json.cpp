@@ -114,15 +114,15 @@ struct JObj {
   };
 
   struct TAttributes {
+    size_t len;        // Number of key-value-pairs.
     const char** keys; // Array of keys 
     JObj** values;     // Array of values.
-    size_t len;        // Number of key-value-pairs.
     const JObj* get(const char* akey) const;
   };
 
   struct TArray {
-    JObj** values; // Array of values
     size_t len;    // Number of elements
+    JObj** values; // Array of values
     const JObj* at(size_t n) const;
   };
 

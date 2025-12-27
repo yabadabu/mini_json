@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
 	assert(items[1].count == 5);
 
 	// Mapping of std::vector is automatically provided
+	json j3 = j["inventory"];
 	std::vector< Item > items2 = j["inventory"].get< std::vector<Item> >();
 
 	// Iterate over the items when inventory is an array

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+ <Type Name="json">
+	<DisplayString Condition="obj == nullptr">empty</DisplayString>
+	<DisplayString Condition="obj->type == JObjType::MAP">JSON Object {obj->object.len} Keys</DisplayString>
+	<DisplayString Condition="obj->type == JObjType::ARRAY">JSON Array Size {obj->array.len} </DisplayString>
+	<DisplayString Condition="obj->type == JObjType::LITERAL">JSON Literal</DisplayString>
+	<DisplayString>non-empty</DisplayString>
+	<Expand>
+    
+    <ArrayItems Condition="obj->type == JObjType::ARRAY">
+      <Size>obj->array.len</Size>
+      <ValuePointer>obj->array.values</ValuePointer>
+    </ArrayItems>
+
+    <CustomListItems Condition="obj->type == JObjType::MAP">
+      <Variable Name="n" InitialValue="0" />
+      <Size>obj->object.len</Size>
+      <Exec>n = 0</Exec>
+      <Loop>
+        <Item Name="{obj->object.keys[n],s}">obj->object.values[n],na</Item>
+        <Exec>n = n + 1</Exec>
+      </Loop>
+    </CustomListItems>
+    
+	</Expand>
+ </Type>
+ <Type Name="JObj">
+   <DisplayString Condition="type == JObjType::MAP">Object {object.len} Keys</DisplayString>
+   <DisplayString Condition="type == JObjType::ARRAY">Array Size {array.len} </DisplayString>
+   <DisplayString Condition="type == JObjType::LITERAL &amp;&amp; literal.type == LITERAL_STRING">String : {literal.text}</DisplayString>
+   <DisplayString Condition="type == JObjType::LITERAL &amp;&amp; literal.type == LITERAL_NUMERIC">Number : {literal.text}</DisplayString>
+   <DisplayString Condition="type == JObjType::LITERAL &amp;&amp; literal.type == LITERAL_BOOL_TRUE">true</DisplayString>
+   <DisplayString Condition="type == JObjType::LITERAL &amp;&amp; literal.type == LITERAL_BOOL_FALSE">false</DisplayString>
+   <DisplayString Condition="type == JObjType::LITERAL &amp;&amp; literal.type == LITERAL_NULL">null</DisplayString>
+   <Expand>
+
+     <ArrayItems Condition="type == JObjType::ARRAY">
+       <Size>(*this).array.len</Size>
+       <ValuePointer>(*this).array.values</ValuePointer>
+     </ArrayItems>
+
+     <CustomListItems Condition="type == JObjType::MAP">
+       <Variable Name="n" InitialValue="0" />
+       <Size>object.len</Size>
+       <Exec>n = 0</Exec>
+       <Loop>
+         <Item Name="{object.keys[n],s}">object.values[n],na</Item>
+         <Exec>n = n + 1</Exec>
+       </Loop>
+     </CustomListItems>
+
+     <Item Condition="type == JObjType::LITERAL" Name="text">literal.text,s</Item>
+     <Item Condition="type == JObjType::LITERAL" Name="literalType">literal.type</Item>
+   </Expand>
+
+ </Type>
+</AutoVisualizer>
