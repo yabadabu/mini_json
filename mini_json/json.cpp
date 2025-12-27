@@ -178,8 +178,7 @@ json json::empty_obj() {
 }
 
 bool JsonParser::checkKeyword(const char *word, size_t word_length) {
-
-  if (top + word_length > end) {
+  if (top - 1 + word_length > end) {
     setErrorText("Unexpected end of stream.");
     return false;
   }
@@ -205,14 +204,15 @@ void JsonParser::setErrorText(const char *new_error) {
   int n = 32;
   if (top + n > end) {
 	  n = (int)(end - top);
-      if (n < 5 ) n = 5;
+    if (n < 5 ) n = 5;
   }
-  snprintf(error_text, sizeof( error_text )-1, "At offset %ld Line %d: %s. Near text: %.*s", (long)(top-1 - start), nline, new_error, n, top - 5);
+  snprintf(error_text, sizeof( error_text )-1, "At offset %ld Line %d: %s. Near text: %.*s", (long)(top-1 - start), nline, new_error, n, top ? top - 5 : "");
 }
 
 JsonParser::TOpCode JsonParser::scanOpCode() {
   while (top != end) {
     char c = *top++;
+    //printf( ">>Testing op %c\n", c);
 
     switch (c) {
     case '{': return MAP_OPEN;
@@ -223,7 +223,9 @@ JsonParser::TOpCode JsonParser::scanOpCode() {
     case ']': return ARRAY_CLOSE;
     case '"': {
       const char *text = top;
+      //printf( "Starting string\n");
       while (top < end && *top != '"') {
+        //printf( "  Accepted %c\n", *top);
         if (*top == '\\')
           ++top;
         ++top;
@@ -232,6 +234,7 @@ JsonParser::TOpCode JsonParser::scanOpCode() {
         setErrorText("Unexpected end of stream parsing string.");
         return END_OF_STREAM;
       }
+      //printf( "end string\n");
       last_str = allocStr(text, top - text);
       ++top;
       return STRING_VALUE;
@@ -258,12 +261,8 @@ JsonParser::TOpCode JsonParser::scanOpCode() {
 
       // Need to take care of floats, e....
       const char *text = top - 1;
-      while (top != end && (isdigit(*top) || *top == '.'))
+      while (top != end && (isdigit(*top) || *top == '.' || *top == 'e' || *top == 'E' || *top == '+' || *top == '-'))
         ++top;
-      if (top == end) {
-        setErrorText("Unexpected end of stream parsing number.");
-        return END_OF_STREAM;
-      }
       last_str = allocStr(text, top - text);
       return NUMERIC_VALUE;
     }
@@ -441,6 +440,7 @@ JObjType JsonParser::parseLiteral(TOpCode op, JObj *obj) {
 JObjType JsonParser::parseObj( JObj *obj ) {
   while (top != end) {
     TOpCode op = scanOpCode();
+    //printf( "Op is %d -> %ld\n", (int)op, end - top );
     if (op == END_OF_STREAM)
       break;
     else if (op == INVALID_OPCODE) {
@@ -454,13 +454,14 @@ JObjType JsonParser::parseObj( JObj *obj ) {
     else
       return parseLiteral( op, obj );
   }
+  //printf( "\n" );
   setErrorText("Unexpected end of stream parsing object.");
   return JObjType::OBJ_INVALID;
 }
 
 // ---------------------------------------------------------
 json JsonParser::parse(const char *buf, size_t nbytes) {
-  
+
   // Reset parsing pointer
   start = buf;
   end = buf + nbytes;
@@ -475,6 +476,17 @@ json JsonParser::parse(const char *buf, size_t nbytes) {
   dbg_printf("%ld bytes parsed. %ld chunks required (%ld bytes) type:%d\n", (long)nbytes, (long)num_chunks_required, (long)(num_chunks_required * chunck_size), otype);
   if (otype == JObjType::OBJ_INVALID)
     root = nullptr;
+  
+  // Check remaining data is only spaces or newlines
+  while( top != end ) {
+    if( *top != 13 && *top != 10 && *top != ' ') {
+      setErrorText("Garbage data after json");
+      root = nullptr;
+      break;
+    }
+    ++top;
+  }
+  
   json j;
   j.obj = root;
   return j;
