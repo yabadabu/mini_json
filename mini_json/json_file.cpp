@@ -1,6 +1,6 @@
 #include "json_file.h"
 
-void unscapeUnicodes(unsigned char* data, size_t data_size) {
+bool unscapeUnicodes(unsigned char* data, size_t data_size, size_t& new_size) {
 
 	size_t spos = 0;
 	unsigned char* dst = data;
@@ -14,7 +14,10 @@ void unscapeUnicodes(unsigned char* data, size_t data_size) {
 				if (hex_char >= '0' && hex_char <= '9') char_value = hex_char - '0';
 				else if (hex_char >= 'A' && hex_char <= 'F') char_value = 10 + hex_char - 'A';
 				else if (hex_char >= 'a' && hex_char <= 'f') char_value = 10 + hex_char - 'a';
-				else { printf("Invalid unicode found in json"); }
+				else { 
+					printf("Invalid unicode found in json\n");
+					return false;
+				}
 				unicode += char_value * (1ULL << ((3 - i) * 4));
 			}
 
@@ -42,6 +45,8 @@ void unscapeUnicodes(unsigned char* data, size_t data_size) {
 			++spos;
 		}
 	}
+	new_size = dst - data;
+	return true;
 }
 
 JsonFile::~JsonFile() {
@@ -60,29 +65,19 @@ JsonFile::JsonFile(const char* filename) {
 		printf("Failed to load json file %s\n", filename);
 		return;
 	}
+	//printf( "Read %zu\n", buf.size() );
+	size_t new_size = 0;
+	if( !unscapeUnicodes(buf.data(), buf.size(), new_size )) {
+		//parseJsonSetError( parser, "Invalid unicode characters in input json");
+		return;
+	}
+	// for( size_t k=0; k<new_size; ++k ) {
+	// 	printf( "unscaped byte %zu is %c\n", k, buf[k]);
+	// }
 
-	unscapeUnicodes(buf.data(), buf.size());
-
-	j = parseJson(parser, (const char*)buf.data(), buf.size());
+	j = parseJson(parser, (const char*)buf.data(), new_size);
 	if (!j) {
 		printf("Invalid json read from file %s: %s\n", filename, getParseErrorText());
 		return;
 	}
 }
-
-//JsonStr::~JsonStr() {
-//	freeJsonParser(parser);
-//}
-//
-//JsonStr::JsonStr(const char* str, size_t str_size) {
-//
-//	parser = allocJsonParser();
-//	Buffer 
-//	unscapeUnicodes(str, str_size);
-//
-//	j = parseJson(parser, (const char*)buf.data(), buf.size());
-//	if (!j) {
-//		printf("Invalid json read from file %s: %s\n", filename, getParseErrorText(parser));
-//		return;
-//	}
-//}
