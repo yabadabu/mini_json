@@ -23,6 +23,9 @@ bool unscapeUnicodes(unsigned char* data, size_t data_size, size_t& new_size) {
 
 			// Convert the code point to UTF-8
 			if (unicode <= 0x7F) {
+				// Convert unicode \ and " in escaped \\ and \"
+				if( unicode == '\"' || unicode == '\\' )
+					*dst++ = '\\';
 				*dst++ = static_cast<char>(unicode & 0xFF);
 			}
 			else if (unicode <= 0x7FF) {
