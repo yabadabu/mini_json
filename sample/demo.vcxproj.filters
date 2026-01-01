@@ -7,7 +7,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="demo.cpp" />
-    <ClCompile Include="..\mini_json\json_file.cpp">
+    <ClCompile Include="..\mini_json\json_data_container.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\mini_json\json.cpp">
@@ -15,7 +15,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\mini_json\json_file.h">
+    <ClInclude Include="..\mini_json\json_data_container.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\mini_json\json.h">
