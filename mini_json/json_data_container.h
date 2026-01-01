@@ -5,9 +5,18 @@
 
 namespace MiniJson {
 
-  class json::DataContainer {
+  class Buffer : public std::vector< uint8_t > {
+  public:
+    bool save(const char* filename) const;
+    void append(char c) {
+      push_back((uint8_t)c);
+    }
+    void append(const char* c, size_t sz) {
+      std::vector<uint8_t>::insert(end(), (const uint8_t*)c, (const uint8_t*)(c + sz));
+    }
+  };
 
-    using Buffer = std::vector< uint8_t >;
+  class json::DataContainer {
 
     Buffer      buf;
     Parser*     parser = nullptr;

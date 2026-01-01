@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include "mini_json/json_std.h"
+#include "mini_json/json_writer.h"
 using namespace MiniJson;
 
 /*
@@ -54,6 +55,11 @@ struct Item {
 		name = j.value("name", name.c_str());
 		count = j.value("count", count);
 	}
+	void save(JsonWriter& jwriter) const {
+		JsonWriter::Obj obj(jwriter);
+		obj.prop("name", name.c_str());
+		obj.prop("count", count);
+  }
 };
 
 // --------------------------------------
@@ -63,6 +69,36 @@ struct ExistingScoreClass {
 
 void load(const json& j, ExistingScoreClass& obj ) {
 	obj.score = j.value("score", obj.score);
+}
+
+void test_writer_single_obj() {
+	Item my_item;
+	my_item.name = "Potion";
+	my_item.count = 3;
+	JsonWriter jwriter;
+	jwriter << my_item;
+	const char* json_text = jwriter.c_str();
+	printf("Written Item JSON:\n%s\n", json_text);
+}
+
+void test_writer_arr_objs() {
+	std::vector<Item> items;
+  Item my_item;
+	my_item.name = "Potion";
+	my_item.count = 3;
+	items.push_back(my_item);
+	my_item.name = "Water";
+	my_item.count = 7;
+	items.push_back(my_item);
+	JsonWriter jwriter;
+	jwriter << items;
+	const char* json_text = jwriter.c_str();
+	printf("Written Items JSON:\n%s\n", json_text);
+}
+
+void test_writer() {
+	test_writer_single_obj();
+	test_writer_arr_objs();
 }
 
 // --------------------------------------
@@ -139,6 +175,8 @@ int main(int argc, char** argv) {
 		printf("Json parse failed : %s\n", jferr.getParseErrorText());
 
 	printf( "sizeof(json) = %d\n", (int) sizeof(json));
+
+	test_writer();
 
 	return 0;
 }
