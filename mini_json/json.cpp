@@ -1,5 +1,6 @@
 #include <cctype>     // isalpha / isdigit
 #include <cstring>    // memcpy
+#include <cstdio>     // printf
 #include <cassert>
 #include <stdlib.h>   // atof
 #include "json.h"
@@ -21,6 +22,7 @@ public:
 	JsonParser(size_t chunck_size = 1024);
 	~JsonParser();
 	const char* getErrorText() const { return error_text; }
+  void setErrorText(const char* new_error_msg);
 
 	json parse(const char* buf, size_t nbytes);
 
@@ -62,7 +64,6 @@ private:
 	// -----------------------------------------
 	// Error 
 	char error_text[256];
-	void setErrorText(const char* new_error);
 
 	// -----------------------------------------
 	// Destination structured buffer
@@ -141,6 +142,7 @@ JsonParser* allocJsonParser() {
 }
 
 void freeJsonParser(JsonParser* p) {
+  if( p )
     delete p;
 }
 
@@ -151,6 +153,11 @@ json parseJson(JsonParser* p, const char* buf, size_t nbytes) {
 const char* getParseErrorText(JsonParser* p) {
   assert( p );
   return p->getErrorText();
+}
+
+void setParseErrorText(JsonParser* p, const char* new_error) {
+  assert( p );
+  p->setErrorText( new_error );
 }
 
 bool json::isArray() const { return obj && obj->type == JObjType::ARRAY; }

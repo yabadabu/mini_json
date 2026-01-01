@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <string>
 #include <unordered_map>
-#include "mini_json/json.h"
+#include "mini_json/json_std.h"
 #include "mini_json/json_file.h"
 
 /*
@@ -67,7 +67,7 @@ void load(const json& j, ExistingScoreClass& obj ) {
 
 // --------------------------------------
 int main(int argc, char** argv) {
-	JsonFile jfile( "items.json" );
+	JsonDataContainer jfile( "items.json" );
 	json j = jfile;
 	if (!j) {
 		printf("Json parse failed : %s\n", jfile.getParseErrorText());
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 	assert( dict[ "north"].name == "Sword" );
 
 	// Errors should provide enough information about the problem
-	JsonFile jferr("broken.json");
+	JsonDataContainer jferr("broken.json");
 	json j2 = jferr;
 	if (!j2) 
 		printf("Json parse failed : %s\n", jferr.getParseErrorText());

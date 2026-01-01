@@ -52,35 +52,42 @@ bool unscapeUnicodes(unsigned char* data, size_t data_size, size_t& new_size) {
 	return true;
 }
 
-JsonFile::~JsonFile() {
+JsonDataContainer::~JsonDataContainer() {
 	freeJsonParser(parser);
 }
 
-const char* JsonFile::getParseErrorText() const {
+const char* JsonDataContainer::getParseErrorText() const {
 	return ::getParseErrorText(parser);
 }
 
-JsonFile::JsonFile(const char* filename) {
-
+bool JsonDataContainer::loadFromFile(const char* filename) {
 	parser = allocJsonParser();
 
-	if (!buf.load(filename)) {
-		printf("Failed to load json file %s\n", filename);
-		return;
+	FILE* f = fopen(filename, "rb");
+	if (!f) {
+		setParseErrorText(parser, "Failed to open input json file");
+		return false;
 	}
+	fseek(f, 0, SEEK_END);
+	size_t sz = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	buf.resize(sz);
+	size_t bytes_read = fread(buf.data(), 1, buf.size(), f);
+	assert(bytes_read == buf.size());
+	fclose(f);
+
 	//printf( "Read %zu\n", buf.size() );
 	size_t new_size = 0;
-	if( !unscapeUnicodes(buf.data(), buf.size(), new_size )) {
-		//parseJsonSetError( parser, "Invalid unicode characters in input json");
-		return;
+	if (!unscapeUnicodes(buf.data(), buf.size(), new_size)) {
+		setParseErrorText(parser, "Invalid unicode characters in input json");
+		return false;
 	}
-	// for( size_t k=0; k<new_size; ++k ) {
-	// 	printf( "unscaped byte %zu is %c\n", k, buf[k]);
-	// }
-
 	j = parseJson(parser, (const char*)buf.data(), new_size);
-	if (!j) {
-		printf("Invalid json read from file %s: %s\n", filename, getParseErrorText());
-		return;
-	}
+	if (!j)
+		return false;
+	return true;
+}
+
+JsonDataContainer::JsonDataContainer(const char* filename) {
+	loadFromFile(filename);
 }

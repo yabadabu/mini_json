@@ -21,8 +21,14 @@
     <ClInclude Include="..\mini_json\json.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\mini_json\json_std.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\mini_json.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
