@@ -5,7 +5,6 @@ This is a json parser to read (there is no write support) and feed structs and c
 # Use case
 
 * You want your project to compile fast. Including json.h only add's the include <type_traits>
-* You do not need to write json files, you just consume json's.
 * You parse a json from files, extract data and forget about the json itself.
 * You can use C++17
 
@@ -14,16 +13,19 @@ This is a json parser to read (there is no write support) and feed structs and c
 You read the file with:
 
 ```cpp
-JsonFile jfile( "items.json" );
+#include "mini_json/json_std.h"
+using json = MiniJson::json;
+...
+json::DataContainer jdata( "items.json" );
 ```
 
 And get the root json value with:
 
 ```cpp
-json j = jfile;
+json j = jdata;
 ```
 
-The `sizeof(json) = 8`, so you can copy/move without worries, as the actual data is owned by the JsonFile object. So do not destroy it.
+The `sizeof(json) = 8`, so you can copy/move without worries, as the actual data is owned by the json::DataContainer object. So do not destroy it.
 
 # Usage
 
@@ -56,7 +58,7 @@ Everytime a json is converted to a C++ type, the templates will trigger a call t
 
 The conversion from json to basic types : `bool/float/int/const char*` is already defined. Your types require the implementation of previous method..
 
-Conversion from `json` array to `std::vector<T>` and `std::unordered_map<std::string,T>` is automatic as long as the conversion from json to T is provided and the json object is an array / object.
+Conversion from `json` array to `std::vector<T>` and `std::unordered_map<std::string,T>` is automatic as long as the conversion from json to T is provided and the json object is an array / object and you include the header `<mini_json/json_std.h>`.
 
 To convert a json to a type T, just directly assign it:
 
@@ -105,5 +107,22 @@ onEachObj( jobj, [](const std::string& name, const Item& jitem) {
 ```
 # Integration
 
-Just add the files json.cpp and json_file.cpp in your project. Check the sample/demo.cpp for more examples.
+Just add the files json.cpp and json_data_container.cpp in your project. Check the sample/demo.cpp for more examples.
  
+# Writing json files
+
+Implement the method `void save( JsonWriter& j ) const` in your struct/class or the global function `void save( JsonWriter& j, const T& obj )`. 
+Then you can use the pattern:
+
+```cpp
+
+	JsonWriter jwriter;
+	jwriter << item;
+	// Returns a null-terminated c-string with the json text
+	const char* json_text = jwriter.c_str();
+	// or 
+	jwriter.saveToFile( "output.json" );
+
+```
+
+There is support for basic types, std::vector<T> as long as T implements the save method or function.

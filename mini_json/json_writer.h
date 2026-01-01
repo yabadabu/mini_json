@@ -196,23 +196,22 @@ namespace MiniJson {
     }
   }
 
+  // SFINAE check for the existence of the load method. Default is you don't have
+  template <typename T, typename = void>
+  struct has_save_method : std::false_type {};
+
+  // But if T.load(json) is not an error, you have it
+  template <typename T>
+  struct has_save_method<T, std::void_t<decltype(std::declval<T>().save(std::declval<MiniJson::JsonWriter&>()))>> : std::true_type {};
+
+  template< typename T>
+  void trySave(MiniJson::JsonWriter& j, T& t) {
+    // Sometimes it might be more convenient
+    if constexpr (has_save_method<T>::value)
+      t.save(j);
+    else
+      save(j, t);
+  }
+
 }
 
-
-
-// SFINAE check for the existence of the load method. Default is you don't have
-template <typename T, typename = void>
-struct has_save_method : std::false_type {};
-
-// But if T.load(json) is not an error, you have it
-template <typename T>
-struct has_save_method<T, std::void_t<decltype(std::declval<T>().save(std::declval<MiniJson::JsonWriter&>()))>> : std::true_type {};
-
-template< typename T>
-void trySave(MiniJson::JsonWriter& j, T& t) {
-  // Sometimes it might be more convenient
-  if constexpr (has_save_method<T>::value)
-    t.save(j);
-  else
-    save(j, t);
-}
