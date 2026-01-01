@@ -20,7 +20,7 @@ void load(MiniJson::json j, std::unordered_map<std::string, T>& v) {
   assert(j.isObject());
   for (size_t i = 0; i < j.size(); ++i) {
     const char* key = j.key(i);
-    json value = j[i];
+    MiniJson::json value = j[i];
     tryLoad(value, v[key]);
   }
 }
