@@ -5,6 +5,12 @@
 namespace MiniJson
 {
 
+  Parser* allocParser();
+  void freeParser(Parser* p);
+  json parseJson(Parser* p, const char* buf, size_t nbytes);
+  const char* getParseErrorText(Parser* p);
+  void setParseErrorText(Parser* p, const char* new_error_msg);
+
   static bool unscapeUnicodes(unsigned char* data, size_t data_size, size_t& new_size) {
 
     size_t spos = 0;
@@ -57,16 +63,16 @@ namespace MiniJson
     return true;
   }
 
-  DataContainer::~DataContainer() {
-    freeJsonParser(parser);
+  json::DataContainer::~DataContainer() {
+    freeParser(parser);
   }
 
-  const char* DataContainer::getParseErrorText() const {
+  const char* json::DataContainer::getParseErrorText() const {
     return MiniJson::getParseErrorText(parser);
   }
 
-  bool DataContainer::loadFromFile(const char* filename) {
-    parser = allocJsonParser();
+  bool json::DataContainer::loadFromFile(const char* filename) {
+    parser = allocParser();
 
     FILE* f = fopen(filename, "rb");
     if (!f) {
@@ -93,7 +99,7 @@ namespace MiniJson
     return true;
   }
 
-  DataContainer::DataContainer(const char* filename) {
+  json::DataContainer::DataContainer(const char* filename) {
     loadFromFile(filename);
   }
 

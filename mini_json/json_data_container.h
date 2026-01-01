@@ -5,12 +5,12 @@
 
 namespace MiniJson {
 
-  class DataContainer {
+  class json::DataContainer {
 
     using Buffer = std::vector< uint8_t >;
 
     Buffer      buf;
-    JsonParser* parser = nullptr;
+    Parser*     parser = nullptr;
     json        j;
 
   public:

@@ -2,8 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include "mini_json/json_std.h"
-#include "mini_json/json_data_container.h"
-using json = MiniJson::json;
+using namespace MiniJson;
 
 /*
 {
@@ -68,7 +67,7 @@ void load(const json& j, ExistingScoreClass& obj ) {
 
 // --------------------------------------
 int main(int argc, char** argv) {
-	MiniJson::DataContainer jfile( "items.json" );
+	json::DataContainer jfile( "items.json" );
 	json j = jfile;
 	if (!j) {
 		printf("Json parse failed : %s\n", jfile.getParseErrorText());
@@ -134,7 +133,7 @@ int main(int argc, char** argv) {
 	assert( dict[ "north"].name == "Sword" );
 
 	// Errors should provide enough information about the problem
-	MiniJson::DataContainer jferr("broken.json");
+	json::DataContainer jferr("broken.json");
 	json j2 = jferr;
 	if (!j2) 
 		printf("Json parse failed : %s\n", jferr.getParseErrorText());

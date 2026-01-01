@@ -15,7 +15,7 @@ namespace MiniJson {
   class json {
 
     const JObj* obj = nullptr;
-    friend class JsonParser;
+    friend class Parser;
 
     json(const JObj* in_obj) : obj(in_obj) {}
 
@@ -86,6 +86,8 @@ namespace MiniJson {
     friend void ::load<int>(json j, int& v);
     friend void ::load<bool>(json j, bool& v);
     friend void ::load<const char*>(json j, const char*& v);
+
+    class DataContainer;
   };
 
   template< typename T>
@@ -123,11 +125,6 @@ namespace MiniJson {
       load(j, t);
   }
 
-  class JsonParser;
-  JsonParser* allocJsonParser();
-  void freeJsonParser(JsonParser* p);
-  json parseJson(JsonParser* p, const char* buf, size_t nbytes);
-  const char* getParseErrorText(JsonParser* p);
-  void setParseErrorText(JsonParser* p, const char* new_error_msg);
+  class Parser;
 }
 

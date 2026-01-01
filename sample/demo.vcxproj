@@ -135,6 +135,7 @@
     <ClInclude Include="..\mini_json\json.h" />
     <ClInclude Include="..\mini_json\json_data_container.h" />
     <ClInclude Include="..\mini_json\json_std.h" />
+    <ClInclude Include="..\mini_json\json_writer.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\mini_json.natvis" />

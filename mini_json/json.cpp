@@ -16,13 +16,13 @@ namespace MiniJson {
     , OBJ_INVALID
   };
 
-  class JsonParser {
+  class Parser {
 
   public:
 
     // -----------------------------------------
-    JsonParser(size_t chunck_size = 1024);
-    ~JsonParser();
+    Parser(size_t chunck_size = 1024);
+    ~Parser();
     const char* getErrorText() const { return error_text; }
     void setErrorText(const char* new_error_msg);
 
@@ -139,25 +139,25 @@ namespace MiniJson {
     friend class json;
   };
 
-  JsonParser* allocJsonParser() {
-    return new JsonParser;
+  Parser* allocParser() {
+    return new Parser;
   }
 
-  void freeJsonParser(JsonParser* p) {
+  void freeParser(Parser* p) {
     if (p)
       delete p;
   }
 
-  json parseJson(JsonParser* p, const char* buf, size_t nbytes) {
+  json parseJson(Parser* p, const char* buf, size_t nbytes) {
     return p->parse(buf, nbytes);
   }
 
-  const char* getParseErrorText(JsonParser* p) {
+  const char* getParseErrorText(Parser* p) {
     assert(p);
     return p->getErrorText();
   }
 
-  void setParseErrorText(JsonParser* p, const char* new_error) {
+  void setParseErrorText(Parser* p, const char* new_error) {
     assert(p);
     p->setErrorText(new_error);
   }
@@ -187,7 +187,7 @@ namespace MiniJson {
     return j_empty_obj;
   }
 
-  bool JsonParser::checkKeyword(const char* word, size_t word_length) {
+  bool Parser::checkKeyword(const char* word, size_t word_length) {
     if (top - 1 + word_length > end) {
       setErrorText("Unexpected end of stream.");
       return false;
@@ -203,7 +203,7 @@ namespace MiniJson {
     return false;
   }
 
-  void JsonParser::setErrorText(const char* new_error) {
+  void Parser::setErrorText(const char* new_error) {
     int nline = 0;
     const char* p = start;
     while (p < top) {
@@ -219,7 +219,7 @@ namespace MiniJson {
     snprintf(error_text, sizeof(error_text) - 1, "At offset %ld Line %d: %s. Near text: %.*s", (long)(top - 1 - start), nline, new_error, n, top ? top - 5 : "");
   }
 
-  JsonParser::TOpCode JsonParser::scanOpCode() {
+  Parser::TOpCode Parser::scanOpCode() {
     while (top != end) {
       char c = *top++;
       //printf( ">>Testing op %c\n", c);
@@ -282,7 +282,7 @@ namespace MiniJson {
 
   // ------------------------------------------------------------------
   // { key1:obj, key2:obj, .. }
-  JObjType JsonParser::parseMap(JObj* obj) {
+  JObjType Parser::parseMap(JObj* obj) {
 
     obj->type = JObjType::MAP;
     obj->object.len = 0;
@@ -367,7 +367,7 @@ namespace MiniJson {
 
   // ------------------------------------------------------------------
   // [ obj, obj, obj .. ]
-  JObjType JsonParser::parseArray(JObj* obj) {
+  JObjType Parser::parseArray(JObj* obj) {
     obj->type = JObjType::ARRAY;
     obj->array.len = 0;
     obj->array.values = NULL;
@@ -426,7 +426,7 @@ namespace MiniJson {
 
   // ------------------------------------------------------------------
   // true|false|null|int|"string"
-  JObjType JsonParser::parseLiteral(TOpCode op, JObj* obj) {
+  JObjType Parser::parseLiteral(TOpCode op, JObj* obj) {
 
     obj->type = JObjType::LITERAL;
     obj->literal.text = last_str;
@@ -447,7 +447,7 @@ namespace MiniJson {
   }
 
   // ---------------------------------------------------------
-  JObjType JsonParser::parseObj(JObj* obj) {
+  JObjType Parser::parseObj(JObj* obj) {
     while (top != end) {
       TOpCode op = scanOpCode();
       //printf( "Op is %d -> %ld\n", (int)op, end - top );
@@ -470,7 +470,7 @@ namespace MiniJson {
   }
 
   // ---------------------------------------------------------
-  json JsonParser::parse(const char* buf, size_t nbytes) {
+  json Parser::parse(const char* buf, size_t nbytes) {
 
     // Reset parsing pointer
     start = buf;
@@ -503,12 +503,12 @@ namespace MiniJson {
   }
 
   // ------------------------------------------------------------------------------
-  JsonParser::JsonParser(size_t in_chunck_size) {
+  Parser::Parser(size_t in_chunck_size) {
     chunck_size = in_chunck_size;
     initial_chunk = allocChunk();
   }
 
-  JsonParser::~JsonParser() {
+  Parser::~Parser() {
     u8* chunk = initial_chunk;
     while (chunk) {
       u8* next_chunk = *nextChunkAddr(chunk);
@@ -519,7 +519,7 @@ namespace MiniJson {
   }
 
   // ------------------------------------------------------------------------------
-  const char* JsonParser::allocStr(const char* buf, size_t nbytes) {
+  const char* Parser::allocStr(const char* buf, size_t nbytes) {
     char* dst = (char*)allocData(nbytes + 1);    // +1 for the terminator
     // evaluate escaped sequences/unicodes/etc..
     memcpy(dst, buf, nbytes);
@@ -527,11 +527,11 @@ namespace MiniJson {
     return dst;
   }
 
-  JObj* JsonParser::allocObj() {
+  JObj* Parser::allocObj() {
     return (JObj*)allocData(sizeof(JObj));
   }
 
-  void* JsonParser::allocData(size_t nbytes) {
+  void* Parser::allocData(size_t nbytes) {
     nbytes = (nbytes + 3) & (~3);   // Keep data aligned to 4 bytes
     assert(nbytes <= chunck_size);
 
@@ -545,7 +545,7 @@ namespace MiniJson {
     return buf;
   }
 
-  JsonParser::u8* JsonParser::allocChunk() {
+  Parser::u8* Parser::allocChunk() {
     u8* chunk = new u8[chunck_size];
     dbg_printf("AllocChunk[%ld] %p of %ld bytes\n", (long)num_chunks_required, chunk, (long)chunck_size);
     ++num_chunks_required;
@@ -563,7 +563,7 @@ namespace MiniJson {
     return chunk;
   }
 
-  JsonParser::u8** JsonParser::nextChunkAddr(u8* curr_chunk) {
+  Parser::u8** Parser::nextChunkAddr(u8* curr_chunk) {
     return (u8**)curr_chunk;
   }
 
